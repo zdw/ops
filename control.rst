@@ -1,6 +1,6 @@
 Chapter 5:  Runtime Control
 ===========================
-	
+
 Runtime Control provides an API by which various principals, such as
 end-users, enterprise admins, and cloud operators, can make changes to
 a running system, by specifying new values for one or more runtime
@@ -17,15 +17,15 @@ of the API call(s) for these operations, the Runtime Control subsystem
 needs to
 
 1. Authenticate the principal wanting to perform the operation.
-   
+
 2. Determine if that principal has sufficient privilege to carry out the
    operation.
-   
+
 3. Push the new parameter setting(s) to one or more backend components.
 
 4. Record the specified parameter setting(s), so the new value(s)
    persist.
-   
+
 In this example, *QoS-Profile* and *Traffic Class* are abstract
 objects being operated upon, and while these objects must be
 understood by Runtime Control, making changes to them might involve
@@ -92,24 +92,24 @@ services. In doing so, Runtime Control must:
 
 * Support new end-to-end abstractions that may cross multiple backend
   subsystems.
-  
+
 * Associate control and configuration state with those abstractions.
-  
+
 * Support *versioning* of this configuration state, so changes can be
   rolled back as necessary, and an audit history may be retrieved of
   previous configurations.
-  
+
 * Adopt best practices of *performance*, *high availability*,
   *reliability*, and *security* in how this abstraction layer is
   implemented.
-  
+
 * Support *Role-Based Access Controls (RBAC)*, so that different
   principals have different visibility into and control over the
   underlying abstract objects.
-  
+
 * Be extensible, and so able to incorporate new services and new
   abstractions for existing services over time.
-  
+
 Central to this role is the requirement that Runtime Control be able
 to represent a set of abstract objects, which is to say, it implements
 a *data model*.  While there are several viable options for the
@@ -131,34 +131,34 @@ that we can build upon.
 
 .. sidebar:: Web Frameworks
 
-	*The role Runtime Control plays in operationalizing a cloud is
-	similar to the role a Web Framework plays in operationalizing
-	a web service. If you start with the assumption that certain
-	classes of users will interact with your system (in our case,
-	an edge cloud) via a GUI, then either you write that GUI in a
-	language like PHP (as early web deverlopers did), our you take
-	advantage of a framework like Django or Ruby on Rails. What
-	such frameworks provide is a way to define a set of
-	user-friendely abstractions (these are called Models), a means
-	to visualize those abstractions in a GUI (these are called
-	Views), and a means to affect change on collection of backend
-	systems based on user input (these are called Controllers). It
-	is not an accident that Model-View-Controller (MVP) is a
-	well-understood design paradigm.*
+    *The role Runtime Control plays in operationalizing a cloud is
+    similar to the role a Web Framework plays in operationalizing
+    a web service. If you start with the assumption that certain
+    classes of users will interact with your system (in our case,
+    an edge cloud) via a GUI, then either you write that GUI in a
+    language like PHP (as early web deverlopers did), our you take
+    advantage of a framework like Django or Ruby on Rails. What
+    such frameworks provide is a way to define a set of
+    user-friendely abstractions (these are called Models), a means
+    to visualize those abstractions in a GUI (these are called
+    Views), and a means to affect change on collection of backend
+    systems based on user input (these are called Controllers). It
+    is not an accident that Model-View-Controller (MVP) is a
+    well-understood design paradigm.*
 
-	*The Runtime Control system described in this chapter adopts a
-	similar approach, but instead of defining the models in Python
-	(as with Django) or Ruby (as with Ruby on Rails), we define
-	models using a declarative language—YANG—which is in turn used
-	to generate a programmatic API. This API can then be invoked
-	from (1) a GUI, which is itself typically built using another
-	framework, such as AngularJS; (2) a CLI; or (3) a closed-loop
-	control program. There are other differences—for example,
-	Adaptors (a kind of Controller) use gNMI as a standard
-	interface for controlling backend components, and persistent
-	state is stored in a K/V Store instead of a SQL DB—but the
-	biggest difference is the use of a declarative rather than an
-	imparative language to define models.*
+    *The Runtime Control system described in this chapter adopts a
+    similar approach, but instead of defining the models in Python
+    (as with Django) or Ruby (as with Ruby on Rails), we define
+    models using a declarative language—YANG—which is in turn used
+    to generate a programmatic API. This API can then be invoked
+    from (1) a GUI, which is itself typically built using another
+    framework, such as AngularJS; (2) a CLI; or (3) a closed-loop
+    control program. There are other differences—for example,
+    Adaptors (a kind of Controller) use gNMI as a standard
+    interface for controlling backend components, and persistent
+    state is stored in a K/V Store instead of a SQL DB—but the
+    biggest difference is the use of a declarative rather than an
+    imparative language to define models.*
 
 With this background, :numref:`Figure %s <fig-roc>` shows the internal
 structure of Runtime Control for Aether, which has **x-config**\—a
@@ -184,7 +184,7 @@ components are described in more detail in the next section.
        and by SD-RAN to manage YANG models for a set of RAN elements.
        This means multiple instances of the x-config microservice run
        in a given Aether edge cluster.
-       
+
 .. _fig-roc:
 .. figure:: figures/Slide15.png
    :width: 500px
@@ -306,14 +306,14 @@ There are four important aspects of this mechanism:
   achieve fault-tolerance and scalable performance. x-config writes
   data to and reads data from Atomix using a simple GET/PUT interface
   common to NoSQL databases.
-  
+
 * **Loading Models:** A Kubernetes Operator (not shown in the figure),
   is responsible for configuring the models within x-config. Models
   to load into x-config are specified by a Helm chart. The operator
   compiles them on demand and incorporates them into x-config. This
   eliminates dynamic load compatibility issues that are a problem when
   models and x-config are built separately.
-  
+
 * **Versioning and Migration:** All the models loaded into x-config
   are versioned, and the process of updating those models triggers the
   migration of persistent state from one version of the data model to
@@ -353,7 +353,7 @@ version control for the Northbound Interface of the cloud, as an
 aggregated whole, is managed in exactly the same way as version control
 for each functional building block that contributes to the cloud's
 internal implementation.
-  
+
 5.2.2 Runtime Control API
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -370,19 +370,19 @@ The Runtime Control API layer serves multiple purposes:
 * Unlike gNMI (which supports only **GET** and **SET** operations), a
   RESTful API (which supports **GET**, **PUT**, **POST**, **PATCH**,
   and **DELETE** operations)  is expected for GUI development.
-  
+
 * The API layer is an opportunity to implement early parameter
   validation and security checks. This makes it possible to catch
   errors closer to the user, and generate more meaningful error
   messages than is possible with gNMI.
-  
+
 * The API layer is an opportunity to implement semantic translation,
   adding methods that go beyond the auto-generated calls.
 
 * The API layer defines a "gate" that can be used to audit the history
   of who performs what operation when (also taking advantage of the
   identity management mechanism described next).
-  
+
 5.2.3 Identity Management
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -571,7 +571,7 @@ following fields:
 * `mbr.uplink`, `mbr.downlink`, `mbr.uplink-burst-size`,
   `mbr.downlink-burst-size`.  Maximum bit-rate and burst sizes for
   this slice.
-  
+
 The rate-related parameters are initialized using a selected
 `template`, as described below. Also note that this example
 illustrates how modeling can be used to enforce invariants, in this
@@ -597,7 +597,7 @@ applications. The `Device-Group` model contains the following fields:
   used. Indirectly identifies the `Enterprise` as `Site` contains a
   reference to `Enterprise`.
 * `mbr.uplink`, `mbr.downlink`: Maximum bit-rate for the device group.
-* `traffic-class`: The traffic class to be used for devices in this group.  
+* `traffic-class`: The traffic class to be used for devices in this group.
 
 At the other end of a Slice is a list of `Application` objects, which
 specifies the endpoints for the program devices talk to. The
@@ -631,33 +631,33 @@ together end-to-end connectivity across the RAN, Core, and Fabric.
 
 .. sidebar:: An API for Platform Services
 
-	*We are using Connectivity-as-a-Service as an illustrative
-	example of the role Runtime Control plays, but APIs can be
-	defined for other platform services using the same
-	machinery. For example, because the SD-Fabric in Aether is
-	implemented with programmable switching hardware, the
-	forwarding plane is instrumented with Inband Network Telemetry
-	(INT). A northbound API then enables fine-grain data
-	collection on a per-flow basis, at runtime, making it possible
-	to write closed-loop control applications on top of Aether.*
+    *We are using Connectivity-as-a-Service as an illustrative
+    example of the role Runtime Control plays, but APIs can be
+    defined for other platform services using the same
+    machinery. For example, because the SD-Fabric in Aether is
+    implemented with programmable switching hardware, the
+    forwarding plane is instrumented with Inband Network Telemetry
+    (INT). A northbound API then enables fine-grain data
+    collection on a per-flow basis, at runtime, making it possible
+    to write closed-loop control applications on top of Aether.*
 
-	*In a similar spirit, the QoS-related control example given in
-	this section could be augmented with additional objects that
-	provide visibility into, and an opportunity to exert control
-	over, various radio-related parameters implemented by SD-RAN.
-	Doing so would be a step towards a platform API that enables
-	a new class of industry automation edge cloud apps.*
+    *In a similar spirit, the QoS-related control example given in
+    this section could be augmented with additional objects that
+    provide visibility into, and an opportunity to exert control
+    over, various radio-related parameters implemented by SD-RAN.
+    Doing so would be a step towards a platform API that enables
+    a new class of industry automation edge cloud apps.*
 
-	*In general, Iaas and PaaS offerings need to support
-	application- and user-facing APIs that go beyond the
-	DevOps-level configuration files consumed by the underlying
-	software components (i.e., microservices). Creating these
-	interfaces is an exercise in defining a meaningful abstraction
-	layer, which when done using declarative tooling, becomes an
-	exercise in defining high-level data models. Runtime Control
-	is the management subsystem responsible specifying and
-	implementing the API for such an abstraction layer.*
-	
+    *In general, Iaas and PaaS offerings need to support
+    application- and user-facing APIs that go beyond the
+    DevOps-level configuration files consumed by the underlying
+    software components (i.e., microservices). Creating these
+    interfaces is an exercise in defining a meaningful abstraction
+    layer, which when done using declarative tooling, becomes an
+    exercise in defining high-level data models. Runtime Control
+    is the management subsystem responsible specifying and
+    implementing the API for such an abstraction layer.*
+
 
 5.3.3 QoS Profiles
 ~~~~~~~~~~~~~~~~~~
@@ -695,7 +695,7 @@ between Runtime Control and the Lifecycle Management subsystem:
 Runtime Control, via an Adaptor, engages Lifecycle Management to
 launch the necessary set of Kubernetes containers that implement an
 isolated slice.
-  
+
 The `Traffic-Class` model, in turn, specifies the classes of traffic,
 and includes the following fields:
 
@@ -726,9 +726,9 @@ program loaded into the switching fabric, as described in a companion
 book.
 
 .. _reading_sdn:
-.. admonition:: Further Reading 
+.. admonition:: Further Reading
 
-   `Software-Defined Networks: A Systems Approach 
+   `Software-Defined Networks: A Systems Approach
    <https://sdn.systemsapproach.org>`__
 
 5.4 Revisiting GitOps
@@ -781,7 +781,7 @@ bridging the gap).
     that shape these abstractions. Considering one without the other,
     as anyone that has read a user's manual understands, is a recipe
     for disaster.*
-    
+
 On this latter point, it is easy to imagine an implementation of a
 runtime control operation that involves checking a configuration
 change into the Config Repo and triggering a redeployment. Whether you
